@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import LoginToChatComponent from "./LoginToChatComponent";
 import MessageComponent from "./MessageComponent";
+import ShowChatsComponent from "./ShowChatsComponent";
 import * as signalR from "@microsoft/signalr";
 
 export default class HomeComponent extends Component {
@@ -13,6 +14,7 @@ export default class HomeComponent extends Component {
     this.state = {
       showLoginPage: true,
       showMessageBox: false,
+      showChats: false,
       messageBoxData: {
         variant: "",
         text: "",
@@ -21,20 +23,54 @@ export default class HomeComponent extends Component {
       signalRConnection: connection,
       signalRData: {
         connectedWithHub: false,
+        userDto: {
+          UserName: "",
+          ChatRoomName: "",
+        },
       },
     };
   }
 
-  closeFunc = () => {
+  displayMessageBox = (messageBoxData) => {
+    this.setState({
+      showMessageBox: true,
+      messageBoxData: messageBoxData,
+    });
+  };
+
+  closeMessageBox = () => {
     this.setState({
       showMessageBox: false,
       messageBoxData: {
-        ...this.state.messageBoxData.closeFunc,
         variant: "",
         text: "",
         title: "",
       },
     });
+  };
+
+  handleDirectives = (directive) => {
+    switch (directive.command) {
+      case "UserNotJoinedToChat":
+        this.setState({ showChats: true, showLoginPage: false });
+      default:
+    }
+  };
+
+  connectToChat = (userName) => {
+    this.setState(
+      {
+        signalRData: {
+          ...this.state.signalRData,
+          userDto: { UserName: userName, ChatRoomName: "" },
+        },
+      },
+      () => {
+        this.state.signalRConnection
+          .invoke("ConnectToChat", this.state.signalRData.userDto)
+          .then(() => {});
+      }
+    );
   };
 
   componentDidMount() {
@@ -43,6 +79,10 @@ export default class HomeComponent extends Component {
       .then(() => {
         this.setState({
           signalRData: { ...this.state.signalRData, connectedWithHub: true },
+        });
+        //handle all responses
+        this.state.signalRConnection.on("ReciveDirective", (directive) => {
+          this.handleDirectives(directive);
         });
       })
       .catch((err) => {
@@ -63,13 +103,18 @@ export default class HomeComponent extends Component {
         {this.state.showMessageBox ? (
           <MessageComponent
             data={this.state.messageBoxData}
-            closeFunc={this.closeFunc}
+            closeFunc={this.closeMessageBox}
           />
         ) : null}
         {this.state.showLoginPage ? (
           <LoginToChatComponent
             isConnectedWithHub={this.state.signalRData.connectedWithHub}
+            connectToChat={this.connectToChat}
+            displayMessageBox={this.displayMessageBox}
           />
+        ) : null}
+        {this.state.showChats ? (
+          <ShowChatsComponent displayMessageBox={this.displayMessageBox} userDto={this.state.signalRData.userDto}/>
         ) : null}
       </Container>
     );
