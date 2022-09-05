@@ -7,7 +7,7 @@ const LoginToChatComponent = (props) => {
   const validateAndSetUserName = (username) => {
     const res = /^[A-Za-z0-9_\.]+$/.exec(username);
     if (res && username.length > 3) {
-      props.connectToChat(username);
+      props.connectToChat(username, "");
     } else
       props.displayMessageBox({
         variant: "warning",

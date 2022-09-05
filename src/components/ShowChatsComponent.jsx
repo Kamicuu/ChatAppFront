@@ -9,6 +9,7 @@ class ShowChatsComponent extends Component {
       chatList: [],
       createNewChat: false,
       newChatName: "",
+      selectedChatName: "",
     };
   }
 
@@ -80,7 +81,12 @@ class ShowChatsComponent extends Component {
           <Form>
             <Form.Group className="mb-3" controlId="formSelectChat">
               <Form.Label>Select the chat you want to connect to</Form.Label>
-              <Form.Select id="chatSelect">
+              <Form.Select
+                id="chatSelect"
+                onChange={(event) =>
+                  this.setState({ selectedChatName: event.target.value })
+                }
+              >
                 {this.state.chatList.map((option, index) => {
                   return (
                     <option key={index} value={option.chatRoomName}>
@@ -125,7 +131,14 @@ class ShowChatsComponent extends Component {
                 </Button>
               </div>
             ) : (
-              <Button variant="primary" type="button">
+              <Button
+                variant="primary"
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  this.props.connectToChat(this.props.userDto.UserName, this.state.selectedChatName);
+                }}
+              >
                 Connect to chat
               </Button>
             )}

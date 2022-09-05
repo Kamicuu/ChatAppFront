@@ -3,6 +3,7 @@ import { Container } from "react-bootstrap";
 import LoginToChatComponent from "./LoginToChatComponent";
 import MessageComponent from "./MessageComponent";
 import ShowChatsComponent from "./ShowChatsComponent";
+import MainChatComponent from "./MainChatComponent";
 import * as signalR from "@microsoft/signalr";
 
 export default class HomeComponent extends Component {
@@ -15,6 +16,7 @@ export default class HomeComponent extends Component {
       showLoginPage: true,
       showMessageBox: false,
       showChats: false,
+      showChatPage: false,
       messageBoxData: {
         variant: "",
         text: "",
@@ -52,23 +54,43 @@ export default class HomeComponent extends Component {
   handleDirectives = (directive) => {
     switch (directive.command) {
       case "UserNotJoinedToChat":
-        this.setState({ showChats: true, showLoginPage: false });
+        this.setState({
+          showChats: true,
+          showLoginPage: false,
+          showChatPage: false,
+        });
+        break;
+      case "UserJoinedChat":
+        this.setState({
+          showChats: false,
+          showLoginPage: false,
+          showChatPage: true,
+        });
+        break;
+      case "UserJoinedToExistingChat":
+        this.setState({
+          showChats: false,
+          showLoginPage: false,
+          showChatPage: true,
+        });
+        break;
       default:
     }
   };
 
-  connectToChat = (userName) => {
+  connectToChat = (userName, chatName) => {
     this.setState(
       {
         signalRData: {
           ...this.state.signalRData,
-          userDto: { UserName: userName, ChatRoomName: "" },
+          userDto: { UserName: userName, ChatRoomName: chatName },
         },
       },
       () => {
-        this.state.signalRConnection
-          .invoke("ConnectToChat", this.state.signalRData.userDto)
-          .then(() => {});
+        this.state.signalRConnection.invoke(
+          "ConnectToChat",
+          this.state.signalRData.userDto
+        );
       }
     );
   };
@@ -114,7 +136,18 @@ export default class HomeComponent extends Component {
           />
         ) : null}
         {this.state.showChats ? (
-          <ShowChatsComponent displayMessageBox={this.displayMessageBox} userDto={this.state.signalRData.userDto}/>
+          <ShowChatsComponent
+            displayMessageBox={this.displayMessageBox}
+            userDto={this.state.signalRData.userDto}
+            connectToChat={this.connectToChat}
+          />
+        ) : null}
+        {this.state.showChatPage ? (
+          <MainChatComponent
+            displayMessageBox={this.displayMessageBox}
+            userDto={this.state.signalRData.userDto}
+            connectToChat={this.connectToChat}
+          />
         ) : null}
       </Container>
     );
