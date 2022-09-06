@@ -21,6 +21,7 @@ export default class HomeComponent extends Component {
         variant: "",
         text: "",
         title: "",
+        disposeTime: 0,
       },
       signalRConnection: connection,
       signalRData: {
@@ -47,6 +48,7 @@ export default class HomeComponent extends Component {
         variant: "",
         text: "",
         title: "",
+        disposeTime: 0,
       },
     });
   };
@@ -66,12 +68,39 @@ export default class HomeComponent extends Component {
           showLoginPage: false,
           showChatPage: true,
         });
+        this.displayMessageBox({
+          variant: "info",
+          text: "User connected with chat: "+directive.message,
+          title: "Connected with chat!",
+          disposeTime: 3,
+        });
         break;
       case "UserJoinedToExistingChat":
         this.setState({
           showChats: false,
           showLoginPage: false,
           showChatPage: true,
+          signalRData: {
+            ...this.state.signalRData,
+            userDto: {
+              ...this.state.signalRData.userDto,
+              ChatRoomName: directive.message,
+            },
+          },
+        });
+        this.displayMessageBox({
+          variant: "info",
+          text: "User reconnected with chat: "+directive.message,
+          title: "Connected with chat!",
+          disposeTime: 3,
+        });
+        break;
+      case "MessageNotSend":
+        this.displayMessageBox({
+          variant: "danger",
+          text: directive.message,
+          title: "Cannot send message!",
+          disposeTime: 4,
         });
         break;
       default:
@@ -102,7 +131,7 @@ export default class HomeComponent extends Component {
         this.setState({
           signalRData: { ...this.state.signalRData, connectedWithHub: true },
         });
-        //handle all responses
+        //handle all directive responses
         this.state.signalRConnection.on("ReciveDirective", (directive) => {
           this.handleDirectives(directive);
         });
@@ -144,7 +173,8 @@ export default class HomeComponent extends Component {
         ) : null}
         {this.state.showChatPage ? (
           <MainChatComponent
-          signalRConnection = {this.state.signalRConnection}
+            displayMessageBox={this.displayMessageBox}
+            signalRConnection={this.state.signalRConnection}
             userDto={this.state.signalRData.userDto}
           />
         ) : null}

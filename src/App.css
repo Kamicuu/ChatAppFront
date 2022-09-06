@@ -44,3 +44,6 @@
 .message_date {
     font-size: 0.80rem;
 }
+.additional_info_titles{
+    min-width: 132px
+}

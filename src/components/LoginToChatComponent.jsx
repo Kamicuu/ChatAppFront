@@ -2,10 +2,10 @@ import React from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 
 const LoginToChatComponent = (props) => {
-  const [login, setLogin] = React.useState("");
+  const loginRef = React.useRef("");
 
-  const validateAndSetUserName = (username) => {
-    const res = /^[A-Za-z0-9_\.]+$/.exec(username);
+  const validateAndConnectToChat = (username) => {
+    const res = /^[A-Za-z0-9_.]+$/.exec(username);
     if (res && username.length > 3) {
       props.connectToChat(username, "");
     } else
@@ -24,13 +24,7 @@ const LoginToChatComponent = (props) => {
             <Form.Label>
               Welcome to ChatAppp! Please provide your username.
             </Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Username"
-              onChange={(e) => {
-                setLogin(e.target.value);
-              }}
-            />
+            <Form.Control type="text" placeholder="Username" ref={loginRef} />
           </Form.Group>
           <Button
             variant="primary"
@@ -38,7 +32,7 @@ const LoginToChatComponent = (props) => {
             disabled={!props.isConnectedWithHub}
             onClick={(event) => {
               event.preventDefault();
-              validateAndSetUserName(login);
+              validateAndConnectToChat(loginRef.current.value);
             }}
           >
             Connect

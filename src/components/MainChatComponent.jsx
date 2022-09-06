@@ -8,6 +8,7 @@ class MainChatComponent extends Component {
     this.chatTextareaRef = React.createRef();
     this.state = {
       chatMessages: [],
+      disableSendButtond: false,
     };
   }
 
@@ -25,22 +26,37 @@ class MainChatComponent extends Component {
   };
 
   sendMessage = () => {
-    this.props.signalRConnection
-      .invoke("SendMessage", {
-        UserName: this.props.userDto.UserName,
-        Message: this.chatTextareaRef.current.value,
-      })
-      .then(() => (this.chatTextareaRef.current.value = ""));
+    const signalR = this.props.signalRConnection;
+
+    if (signalR.state === "Connected") {
+      signalR
+        .invoke("SendMessage", {
+          UserName: this.props.userDto.UserName,
+          Message: this.chatTextareaRef.current.value,
+        })
+        .then(() => (this.chatTextareaRef.current.value = ""));
+    } else {
+      this.setState({ disableSendButtond: true });
+      this.props.displayMessageBox({
+        variant: "danger",
+        title: "Error while sending message",
+        text: "Connection problems with chathub, please reconnect to chat.",
+      });
+    }
   };
 
   render() {
     return (
       <Row className="main_chat_container">
-        <Col sm={3} className="chat_left_panel border border-2 my-5"></Col>
+        <Col sm={3} className="chat_left_panel border border-2 my-5">
+          <Row className="m-2">
+            <Col className="additional_info_titles">Current chat:</Col><Col>{this.props.userDto.ChatRoomName}</Col>
+          </Row>
+        </Col>
         <Col sm={9}>
           <Row className="chat_window border border-2 m-5 align-content-start p-1">
-            {this.state.chatMessages.map((ele)=>{
-                return(<ChatMessageComponent message={ele}/>)
+            {this.state.chatMessages.map((ele, index) => {
+              return <ChatMessageComponent key={index} message={ele} />;
             })}
           </Row>
           <Row className="chat_textbox border border-2 m-5">
@@ -55,6 +71,7 @@ class MainChatComponent extends Component {
                 />
               </Form.Group>
               <Button
+                disabled={this.state.disableSendButtond}
                 className="w-25 align-self-end"
                 onClick={(event) => {
                   event.preventDefault();

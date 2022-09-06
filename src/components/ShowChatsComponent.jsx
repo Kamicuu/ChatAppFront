@@ -24,7 +24,7 @@ class ShowChatsComponent extends Component {
       headers: { "Content-Type": "application/json" },
     })
       .then((resp) => {
-        this.setState({ chatList: resp.data });
+        this.setState({ chatList: resp.data, selectedChatName: resp?.data[0].chatRoomName});
       })
       .catch((err) => {
         this.props.displayMessageBox({
@@ -41,7 +41,7 @@ class ShowChatsComponent extends Component {
       ChatRoomName: chatName,
       CreatedBy: this.props.userDto.UserName,
     };
-    const res = /^[A-Za-z0-9_\.]+$/.exec();
+    const res = /^[A-Za-z0-9_.]+$/.exec();
     if (res && chatName.length > 2) {
       axios({
         method: "post",
