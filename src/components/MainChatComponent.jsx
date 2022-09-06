@@ -18,6 +18,10 @@ class MainChatComponent extends Component {
     });
   }
 
+  componentWillUnmount() {
+    this.props.signalRConnection.off("ReciveMessage");
+  }
+
   handleMessage = (message) => {
     let messagesArray = this.state.chatMessages;
     message.time = new Date().toLocaleString();
@@ -49,8 +53,29 @@ class MainChatComponent extends Component {
     return (
       <Row className="main_chat_container">
         <Col sm={3} className="chat_left_panel border border-2 my-5">
-          <Row className="m-2">
-            <Col className="additional_info_titles">Current chat:</Col><Col>{this.props.userDto.ChatRoomName}</Col>
+          <Row className="m-2 d-flex">
+            <Row className="mb-1">
+              <Col className="additional_info_titles align-self-center">
+                Disconnect:
+              </Col>
+              <Col className="fw-bolder align-self-center">
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={() => this.props.disconnectFromChat()}
+                >
+                  X
+                </Button>
+              </Col>
+            </Row>
+            <Row className="mb-1">
+              <Col className="additional_info_titles align-self-center">
+                Current chat:
+              </Col>
+              <Col className="fw-bolder align-self-center">
+                {this.props.userDto.ChatRoomName}
+              </Col>
+            </Row>
           </Row>
         </Col>
         <Col sm={9}>

@@ -70,7 +70,7 @@ export default class HomeComponent extends Component {
         });
         this.displayMessageBox({
           variant: "info",
-          text: "User connected with chat: "+directive.message,
+          text: "User connected with chat: " + directive.message,
           title: "Connected with chat!",
           disposeTime: 3,
         });
@@ -90,7 +90,7 @@ export default class HomeComponent extends Component {
         });
         this.displayMessageBox({
           variant: "info",
-          text: "User reconnected with chat: "+directive.message,
+          text: "User reconnected with chat: " + directive.message,
           title: "Connected with chat!",
           disposeTime: 3,
         });
@@ -101,6 +101,13 @@ export default class HomeComponent extends Component {
           text: directive.message,
           title: "Cannot send message!",
           disposeTime: 4,
+        });
+        break;
+      case "UserDisconnectedFromChat":
+        this.displayMessageBox({
+          variant: "success",
+          text: directive.message,
+          title: "Disconnected form chat.",
         });
         break;
       default:
@@ -122,6 +129,25 @@ export default class HomeComponent extends Component {
         );
       }
     );
+  };
+
+  disconnectFromChat = () => {
+    this.state.signalRConnection
+      .invoke("DisconnectFromChat", this.state.signalRData.userDto)
+      .then(() => {
+        this.setState({
+          showChats: false,
+          showLoginPage: true,
+          showChatPage: false,
+          signalRData: {
+            ...this.state.signalRData,
+            userDto: {
+              UserName: "",
+              ChatRoomName: "",
+            },
+          },
+        });
+      });
   };
 
   componentDidMount() {
@@ -174,6 +200,7 @@ export default class HomeComponent extends Component {
         {this.state.showChatPage ? (
           <MainChatComponent
             displayMessageBox={this.displayMessageBox}
+            disconnectFromChat={this.disconnectFromChat}
             signalRConnection={this.state.signalRConnection}
             userDto={this.state.signalRData.userDto}
           />
