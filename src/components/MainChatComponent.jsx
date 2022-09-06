@@ -44,7 +44,7 @@ class MainChatComponent extends Component {
       this.props.displayMessageBox({
         variant: "danger",
         title: "Error while sending message",
-        text: "Connection problems with chathub, please reconnect to chat.",
+        text: "Connection problems with chathub, please refresh app.",
       });
     }
   };

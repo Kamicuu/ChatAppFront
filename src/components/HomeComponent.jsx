@@ -115,39 +115,65 @@ export default class HomeComponent extends Component {
   };
 
   connectToChat = (userName, chatName) => {
-    this.setState(
-      {
-        signalRData: {
-          ...this.state.signalRData,
-          userDto: { UserName: userName, ChatRoomName: chatName },
+    const signalR = this.state.signalRConnection;
+
+    if (signalR.state === "Connected") {
+      this.setState(
+        {
+          signalRData: {
+            ...this.state.signalRData,
+            userDto: { UserName: userName, ChatRoomName: chatName },
+          },
         },
-      },
-      () => {
-        this.state.signalRConnection.invoke(
-          "ConnectToChat",
-          this.state.signalRData.userDto
-        );
-      }
-    );
+        () => {
+          signalR.invoke("ConnectToChat", this.state.signalRData.userDto);
+        }
+      );
+    } else {
+      this.setState({
+        signalRData: {
+          connectedWithHub: false,
+          userDto: {
+            UserName: "",
+            ChatRoomName: "",
+          },
+        },
+      });
+      this.displayMessageBox({
+        variant: "danger",
+        title: "Error while connecting to chat!",
+        text: "Connection problems with chathub, please refresh app.",
+      });
+    }
   };
 
   disconnectFromChat = () => {
-    this.state.signalRConnection
-      .invoke("DisconnectFromChat", this.state.signalRData.userDto)
-      .then(() => {
-        this.setState({
-          showChats: false,
-          showLoginPage: true,
-          showChatPage: false,
-          signalRData: {
-            ...this.state.signalRData,
-            userDto: {
-              UserName: "",
-              ChatRoomName: "",
+    const signalR = this.state.signalRConnection;
+
+    if (signalR.state === "Connected") {
+      signalR
+        .invoke("DisconnectFromChat", this.state.signalRData.userDto)
+        .then(() => {
+          this.setState({
+            showChats: false,
+            showLoginPage: true,
+            showChatPage: false,
+            signalRData: {
+              ...this.state.signalRData,
+              userDto: {
+                UserName: "",
+                ChatRoomName: "",
+              },
             },
-          },
+          });
         });
+    } else {
+      this.displayMessageBox({
+        variant: "danger",
+        title: "Error while disconnecting from chat!",
+        text: "Connection problems with chathub, please refresh app.",
       });
+    }
   };
 
   componentDidMount() {
