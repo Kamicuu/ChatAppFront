@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Form, Button } from "react-bootstrap";
+import { Row, Col, Form, Button, ListGroup } from "react-bootstrap";
 import ChatMessageComponent from "./ChatMessageComponent";
 
 class MainChatComponent extends Component {
@@ -11,7 +11,7 @@ class MainChatComponent extends Component {
       disableSendButtond: false,
     };
   }
-
+  
   componentDidMount() {
     this.props.signalRConnection.on("ReciveMessage", (message) => {
       this.handleMessage(message);
@@ -76,6 +76,26 @@ class MainChatComponent extends Component {
                 {this.props.userDto.ChatRoomName}
               </Col>
             </Row>
+            <Row className="mb-1">
+              <Col className="additional_info_titles align-self-center">
+                Logged as:
+              </Col>
+              <Col className="fw-bolder align-self-center">
+                {this.props.userDto.UserName}
+              </Col>
+            </Row>
+            <Row className="my-2">
+              <Col>Users assigned to chat:</Col>
+            </Row>
+            <Row>
+              <Col>
+                <ListGroup variant="flush">
+                  {this.props.chatUsers.map((user, index) => {
+                    return <ListGroup.Item>{user}</ListGroup.Item>;
+                  })}
+                </ListGroup>
+              </Col>
+            </Row>
           </Row>
         </Col>
         <Col sm={9}>
@@ -89,6 +109,9 @@ class MainChatComponent extends Component {
               <Form.Group className="mb-3" controlId="messagesArea">
                 <Form.Control
                   as="textarea"
+                  onKeyPress={(event) => {
+                    if (event.key === "Enter") this.sendMessage();
+                  }}
                   placeholder="Message content..."
                   className="chat_textarea"
                   rows={6}

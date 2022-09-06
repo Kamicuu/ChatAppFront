@@ -20,7 +20,7 @@ class ShowChatsComponent extends Component {
   fetchChats = () => {
     axios({
       method: "get",
-      url: "https://localhost:44360/api/chats",
+      url: "https://"+window.location.hostname+":44360/api/chats",
       headers: { "Content-Type": "application/json" },
     })
       .then((resp) => {

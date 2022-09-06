@@ -10,7 +10,7 @@ export default class HomeComponent extends Component {
   constructor(props) {
     super(props);
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:44360/chat")
+      .withUrl("https://" + window.location.hostname + ":44360/chat")
       .build();
     this.state = {
       showLoginPage: true,
@@ -31,6 +31,7 @@ export default class HomeComponent extends Component {
           ChatRoomName: "",
         },
       },
+      chatUsers: [],
     };
   }
 
@@ -109,6 +110,9 @@ export default class HomeComponent extends Component {
           text: directive.message,
           title: "Disconnected form chat.",
         });
+        break;
+      case "ChatUsersUpdate":
+        this.setState({ chatUsers: directive.message });
         break;
       default:
     }
@@ -229,6 +233,7 @@ export default class HomeComponent extends Component {
             disconnectFromChat={this.disconnectFromChat}
             signalRConnection={this.state.signalRConnection}
             userDto={this.state.signalRData.userDto}
+            chatUsers={this.state.chatUsers}
           />
         ) : null}
       </Container>
