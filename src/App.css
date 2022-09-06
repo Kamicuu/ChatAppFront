@@ -1,6 +1,46 @@
-.main_container{
-    min-height: 100vh!important;
+.main_container {
+    min-height: 100vh !important;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.main_chat_container {
+    min-height: 100vh;
+    min-width: 100%;
+}
+
+.chat_window {
+    height: 60vh;
+    background-color: rgb(224, 224, 224);
+    overflow-y: scroll;
+}
+
+.chat_textbox {
+    min-height: 25vh;
+    background-color: rgb(224, 224, 224);
+}
+
+.chat_textarea {
+    resize: none !important;
+    border: none !important;
+    background-color: rgb(255, 255, 255) !important;
+    border-radius: 0 !important;
+}
+
+.chat_left_panel {
+    background-color: rgb(224, 224, 224);
+}
+
+.chat_message {
+    height: fit-content !important;
+    border-radius: 0 !important;
+}
+
+.chat_message p {
+    font-size: 0.86rem;
+}
+
+.message_date {
+    font-size: 0.80rem;
 }

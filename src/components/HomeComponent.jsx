@@ -130,23 +130,22 @@ export default class HomeComponent extends Component {
         ) : null}
         {this.state.showLoginPage ? (
           <LoginToChatComponent
-            isConnectedWithHub={this.state.signalRData.connectedWithHub}
-            connectToChat={this.connectToChat}
             displayMessageBox={this.displayMessageBox}
+            connectToChat={this.connectToChat}
+            isConnectedWithHub={this.state.signalRData.connectedWithHub}
           />
         ) : null}
         {this.state.showChats ? (
           <ShowChatsComponent
             displayMessageBox={this.displayMessageBox}
-            userDto={this.state.signalRData.userDto}
             connectToChat={this.connectToChat}
+            userDto={this.state.signalRData.userDto}
           />
         ) : null}
         {this.state.showChatPage ? (
           <MainChatComponent
-            displayMessageBox={this.displayMessageBox}
+          signalRConnection = {this.state.signalRConnection}
             userDto={this.state.signalRData.userDto}
-            connectToChat={this.connectToChat}
           />
         ) : null}
       </Container>
